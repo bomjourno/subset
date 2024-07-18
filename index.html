@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subset Sum Problem</title>
+</head>
+<body>
+    <input type="number" id="target" placeholder="Введите целевую сумму">
+    <textarea id="numbers" placeholder="Введите числа через запятую"></textarea>
+    <button onclick="findSubsetSum()">Найти</button>
+    <div id="result"></div>
+
+    <script>
+        function findSubsetSum() {
+            const target = parseInt(document.getElementById('target').value);
+            const numbers = document.getElementById('numbers').value.split(',').map(Number);
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = '';
+
+            const result = subsetSum(numbers, target);
+            if (result) {
+                resultDiv.innerHTML = `Найденное подмножество: ${result.join(', ')}`;
+            } else {
+                resultDiv.innerHTML = 'Нет подходящего подмножества';
+            }
+        }
+
+        function subsetSum(numbers, target) {
+            const n = numbers.length;
+
+            // Таблица для хранения результатов динамического программирования
+            const dp = Array.from({ length: n + 1 }, () => Array(target + 1).fill(false));
+            for (let i = 0; i <= n; i++) {
+                dp[i][0] = true;
+            }
+
+            for (let i = 1; i <= n; i++) {
+                for (let sum = 1; sum <= target; sum++) {
+                    if (sum < numbers[i - 1]) {
+                        dp[i][sum] = dp[i - 1][sum];
+                    } else {
+                        dp[i][sum] = dp[i - 1][sum] || dp[i - 1][sum - numbers[i - 1]];
+                    }
+                }
+            }
+
+            if (!dp[n][target]) {
+                return null;
+            }
+
+            const subset = [];
+            let sum = target;
+            for (let i = n; i > 0 && sum > 0; i--) {
+                if (!dp[i - 1][sum]) {
+                    subset.push(numbers[i - 1]);
+                    sum -= numbers[i - 1];
+                }
+            }
+
+            return subset;
+        }
+    </script>
+</body>
+</html>
